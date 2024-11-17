@@ -34,38 +34,33 @@ def collect_psnr_data(base_folder, equalize=False, scale_lr=False):
                 psnr_data[m] += psnr / len(scenes)
     return psnr_data
 
-def plot_psnr(psnr_data, psnr_data_equalize, psnr_data_equalize_scaled_lr):
-    xs = sorted(psnr_data.keys(), key=int)
-    ys = [psnr_data[x] for x in xs]
+def plot_psnr(psnr_data_equalize, psnr_data_equalize_scaled_lr):
+    xs = sorted(psnr_data_equalize.keys(), key=int)
     ys_equalize = [psnr_data_equalize[x] for x in xs]
     ys_equalize_scaled_lr = [psnr_data_equalize_scaled_lr[x] for x in xs]
-    print(xs, ys)
     print(xs, ys_equalize)
     print(xs, ys_equalize_scaled_lr)
 
     # plot data points too
-    plt.plot(xs, ys, label='M × Epochs', marker='o')
-    plt.plot(xs, ys_equalize, label='Constant Epochs', marker='o')
-    plt.plot(xs, ys_equalize_scaled_lr, label='Constant Epochs, Scaled Hypers', marker='o')
-    plt.xlabel('Number of Views (M)')
+    plt.plot(xs, ys_equalize, label='Default Hypers', marker='o')
+    plt.plot(xs, ys_equalize_scaled_lr, label='Scaled Hypers (ours)', marker='o')
+    plt.xlabel('Batch Size')
     plt.ylabel('PSNR')
     plt.grid()
     # label y values
-    for i in range(1, len(ys)):
-        plt.annotate(f'{ys[i]:.2f}', (xs[i], ys[i]), textcoords="offset points", xytext=(0, 10), ha='center')
+    for i in range(1, len(ys_equalize)):
         plt.annotate(f'{ys_equalize[i]:.2f}', (xs[i], ys_equalize[i]), textcoords="offset points", xytext=(0, 10), ha='center')
         plt.annotate(f'{ys_equalize_scaled_lr[i]:.2f}', (xs[i], ys_equalize_scaled_lr[i]), textcoords="offset points", xytext=(0, 10), ha='center')
-    plt.ylim(28.5, 32.5)
+    plt.ylim(24, 28)
     plt.legend()
-    plt.title('PSNR vs Number of Views')
-    plt.savefig('ablation_plots/PSNR_vs_num_views_vs_num_epochs.png')
-    plt.savefig('ablation_plots/PSNR_vs_num_views_vs_num_epochs.pdf')
+    plt.title('PSNR vs Batch Size (Garden Scene)')
+    plt.savefig('ablation_plots/garden_PSNR_vs_scaled_hypers.png')
+    plt.savefig('ablation_plots/garden_PSNR_vs_scaled_hypers.pdf')
     plt.show()
     plt.close()
 
-base_folder = './eval_dense'
-psnr_data = collect_psnr_data(base_folder)
+base_folder = './eval_garden'
 psnr_data_equalize = collect_psnr_data(base_folder, equalize=True, scale_lr=False)
 psnr_data_equalize_scaled_lr = collect_psnr_data(base_folder, equalize=True, scale_lr=True)
 
-plot_psnr(psnr_data, psnr_data_equalize, psnr_data_equalize_scaled_lr)
+plot_psnr(psnr_data_equalize, psnr_data_equalize_scaled_lr)
