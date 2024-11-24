@@ -25,10 +25,11 @@ parser = ArgumentParser(description="Full evaluation script parameters")
 parser.add_argument("--skip_training", action="store_true")
 parser.add_argument("--skip_rendering", action="store_true")
 parser.add_argument("--skip_metrics", action="store_true")
-parser.add_argument("--output_path", default="./eval_dense/eval")
+parser.add_argument("--output_path", default="./eval")
 parser.add_argument("--use_depth", action="store_true")
 parser.add_argument("--use_expcomp", action="store_true")
 parser.add_argument("--fast", action="store_true")
+parser.add_argument("--radam", action="store_true")
 parser.add_argument("--aa", action="store_true")
 parser.add_argument("--mv", type=int, default=None)
 parser.add_argument("--mv_equalize", action="store_true")
@@ -50,6 +51,9 @@ if not args.skip_training or not args.skip_rendering:
     parser.add_argument("--tanksandtemples", "-tat", required=True, type=str)
     parser.add_argument("--deepblending", "-db", required=True, type=str)
     args = parser.parse_args()
+
+if args.radam:
+    args.output_path += "_radam/eval"
 
 if args.mv is not None:
     args.output_path += f"_mv_{args.mv:02d}"
@@ -79,6 +83,8 @@ if not args.skip_training:
 
     if args.fast:
         common_args += " --optimizer_type sparse_adam "
+    elif args.radam:
+        common_args += " --optimizer_type radam "
 
     if args.mv_scale_lr:
         common_args += " --scale_lr"

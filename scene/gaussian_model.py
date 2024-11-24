@@ -196,9 +196,11 @@ class GaussianModel:
             {'params': [self._scaling], 'lr': training_args.scaling_lr * batched_lr_scale, "name": "scaling"},
             {'params': [self._rotation], 'lr': training_args.rotation_lr * batched_lr_scale, "name": "rotation"}
         ]
-
+        assert self.optimizer_type in ["radam"]
         if self.optimizer_type == "default":
             self.optimizer = torch.optim.Adam(l, lr=0.0, eps=1e-15, betas=self.get_batched_betas())
+        elif self.optimizer_type == "radam":
+            self.optimizer = torch.optim.RAdam(l, lr=0.0, eps=1e-15, betas=self.get_batched_betas())
         elif self.optimizer_type == "sparse_adam":
             if self.scale_lr_batch_size != 1:
                 raise ValueError("Sparse Adam is not compatible with betas scaling for batched inputs.")
